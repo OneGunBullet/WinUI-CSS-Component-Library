@@ -1,0 +1,445 @@
+/* WinUI-like CSS component library
+   - Tokens (customize)
+   - Materials: mica & acrylic
+   - Controls: buttons, inputs, cards, menus, sidebars, modals, toasts, etc.
+   - Reveal/highlight animations
+   - Author: copilot-style template
+   Usage: include this CSS, and add the corresponding HTML structure/classes.
+*/
+
+/* ---------------------------
+   Design tokens (light & dark)
+   --------------------------- */
+:root{
+  /* Theme mode token - set to 'light' or 'dark' on document element to override */
+  --winui-radius: 10px;
+  --winui-radius-sm: 6px;
+  --winui-radius-lg: 14px;
+
+  --winui-font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
+  --winui-font-size: 14px;
+  --winui-line-height: 1.4;
+
+  /* Neutral palette */
+  --neutral-0: #ffffff;
+  --neutral-10: #f3f3f4;
+  --neutral-20: #ededee;
+  --neutral-30: #e1e1e2;
+  --neutral-40: #c8c8c9;
+  --neutral-60: #8a8a8b;
+  --neutral-80: #444445;
+  --neutral-90: #2b2b2c;
+  --neutral-100: #000000;
+
+  /* Accent default (blue) */
+  --accent-100: #0078d4; /* primary accent */
+  --accent-90: #106ebe;
+  --accent-60: #2b88d8;
+  --accent-40: #cfe9ff;
+
+  /* Elevation / shadows */
+  --elevation-1: 0 1px 2px rgba(16,16,16,0.05), 0 1px 3px rgba(16,16,16,0.04);
+  --elevation-2: 0 6px 20px rgba(16,16,16,0.12);
+  --elevation-3: 0 12px 30px rgba(16,16,16,0.18);
+
+  /* Acrylic/mica */
+  --mica-base: rgba(255,255,255,0.72);
+  --acrylic-layer: rgba(255,255,255,0.45);
+  --reveal-color: rgba(0,0,0,0.06);
+
+  /* Motion */
+  --motion-duration-fast: 160ms;
+  --motion-duration: 240ms;
+  --motion-duration-slow: 420ms;
+  --motion-easing: cubic-bezier(.2,.9,.2,1);
+
+  /* Component sizes */
+  --btn-height: 36px;
+  --icon-btn-size: 36px;
+  --input-height: 36px;
+
+  color-scheme: light;
+  --winui-bg: var(--neutral-10);
+  --winui-fore: var(--neutral-100);
+  --winui-muted: var(--neutral-60);
+}
+
+/* Dark theme overrides - set data-theme="dark" on <html> or <body> */
+:root[data-theme="dark"]{
+  --paren: 0;
+  --neutral-0: #0b0b0c;
+  --neutral-10: #0f0f10;
+  --neutral-20: #151516;
+  --neutral-30: #1d1d1e;
+  --neutral-40: #242425;
+  --neutral-60: #9a9aa0;
+  --neutral-80: #d1d1d6;
+  --neutral-90: #ededee;
+  --neutral-100: #ffffff;
+
+  --accent-100: #2899f5;
+  --accent-90: #1f6fd9;
+  --accent-60: #2b88d8;
+  --accent-40: rgba(43,136,216,0.12);
+
+  --mica-base: rgba(20,20,21,0.56);
+  --acrylic-layer: rgba(20,20,21,0.32);
+  --reveal-color: rgba(255,255,255,0.06);
+
+  --winui-bg: var(--neutral-10);
+  --winui-fore: var(--neutral-100);
+  --winui-muted: var(--neutral-80);
+  color-scheme: dark;
+}
+
+/* Base resets */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--winui-font-family);
+  font-size:var(--winui-font-size);
+  line-height:var(--winui-line-height);
+  background: linear-gradient(180deg, var(--winui-bg), rgba(0,0,0,0)) fixed;
+  color:var(--winui-fore);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Utility: visually-hidden */
+.winui-sr-only{
+  position:absolute!important;
+  width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+/* ---------------------------
+   Materials: mica & acrylic
+   --------------------------- */
+
+/* Mica: layered, subtle tint, no blur (approximation) */
+.winui-mica{
+  position:relative;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)),
+    var(--mica-base);
+  border-radius:var(--winui-radius);
+  overflow:hidden;
+  backdrop-filter: none;
+  box-shadow: var(--elevation-1);
+  color:var(--winui-fore);
+}
+
+/* Acrylic: translucent blur with tint */
+.winui-acrylic{
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border-radius:var(--winui-radius);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: var(--elevation-1);
+}
+
+/* Reveal highlight effect approximating WinUI Reveal */
+.winui-reveal{
+  position:relative;
+  overflow:hidden;
+}
+.winui-reveal::after{
+  content:"";
+  position:absolute;
+  left:0;top:0;right:0;bottom:0;
+  pointer-events:none;
+  transition:opacity var(--motion-duration) linear, transform var(--motion-duration) linear;
+  transform-origin: center;
+  opacity:0;
+  background: radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(255,255,255,0.06), transparent 40%);
+  mix-blend-mode: screen;
+}
+/* for dark theme blend differently */
+:root[data-theme="dark"] .winui-reveal::after{
+  background: radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(0,0,0,0.16), transparent 40%);
+  mix-blend-mode: multiply;
+}
+.winui-reveal:hover::after,
+.winui-reveal:focus-within::after{ opacity:1; transform: scale(1.08); }
+
+/* ---------------------------
+   Buttons
+   --------------------------- */
+
+.winui-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:var(--btn-height);
+  min-width:44px;
+  padding:0 12px;
+  gap:8px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  background:transparent;
+  color:var(--winui-fore);
+  transition:transform var(--motion-duration-fast) var(--motion-easing), box-shadow var(--motion-duration);
+  font-weight:600;
+  user-select:none;
+  -webkit-user-select:none;
+  position:relative;
+  text-decoration:none;
+  outline: none;
+}
+
+/* Primary */
+.winui-btn.primary{
+  background: linear-gradient(0deg, var(--accent-100), var(--accent-100));
+  color: white;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.08), 0 6px 20px rgba(0,0,0,0.08);
+}
+.winui-btn.primary:hover{ transform: translateY(-1px) scale(1.01); filter:brightness(1.02) }
+.winui-btn.primary:active{ transform: translateY(0) scale(0.998); filter:brightness(.98) }
+
+/* Secondary */
+.winui-btn.secondary{
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
+  border:1px solid rgba(0,0,0,0.06);
+  color:var(--winui-fore);
+}
+.winui-btn.ghost{
+  background:transparent;
+  border: 1px dashed rgba(0,0,0,0.06);
+  color:var(--winui-fore);
+}
+
+/* Icon button */
+.winui-icon-btn{
+  width:var(--icon-btn-size);
+  height:var(--icon-btn-size);
+  padding:6px;
+  border-radius:8px;
+  display:inline-grid;
+  place-items:center;
+  background:transparent;
+  border:none;
+}
+.winui-icon-btn:hover{ background: rgba(0,0,0,0.04) }
+
+/* Toggle split/small variants */
+.winui-btn.small{ height:28px; padding:0 8px; font-size:13px; border-radius:6px }
+.winui-btn.round{ border-radius:999px }
+
+/* Button icon helper */
+.winui-icon{
+  display:inline-flex;
+  width:18px;height:18px;
+  align-items:center;justify-content:center;
+  pointer-events:none;
+  fill:currentColor;
+}
+
+/* ---------------------------
+   Inputs / Search / Textareas
+   --------------------------- */
+.winui-input{
+  display:inline-flex;
+  align-items:center;
+  height:var(--input-height);
+  min-width:180px;
+  gap:8px;
+  padding:0 10px;
+  border-radius:8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  border:1px solid rgba(0,0,0,0.06);
+  color:var(--winui-fore);
+}
+.winui-input input,
+.winui-input textarea{
+  border:0;outline:0;background:transparent;color:inherit;font:inherit;
+  width:100%;
+}
+.winui-input:focus-within{ box-shadow: 0 0 0 4px rgba(43,136,216,0.08) }
+
+/* Search box: icon + input */
+.winui-search{ min-width:280px }
+.winui-search .winui-icon{ opacity:0.8 }
+
+/* ---------------------------
+   Cards and surfaces
+   --------------------------- */
+.winui-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  border-radius: var(--winui-radius);
+  padding:16px;
+  box-shadow: var(--elevation-1);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Card header / footer */
+.winui-card .card-header{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;
+}
+.winui-card .card-media{ border-radius:8px; overflow:hidden; }
+
+/* ---------------------------
+   Navigation / Sidebar
+   --------------------------- */
+.winui-sidebar{
+  width:256px;
+  padding:12px;
+  display:flex;flex-direction:column;gap:8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  border-right:1px solid rgba(0,0,0,0.04);
+  min-height:100vh;
+}
+.winui-nav-item{
+  display:flex;align-items:center;gap:12px;padding:8px;border-radius:8px;cursor:pointer;
+  color:var(--winui-fore);text-decoration:none;
+}
+.winui-nav-item .label{ font-weight:600 }
+.winui-nav-item:hover{ background: rgba(0,0,0,0.03) }
+.winui-nav-item.active{ background: linear-gradient(180deg,var(--accent-40),transparent); color:var(--accent-100) }
+
+/* Top app bar / command bar */
+.winui-topbar{
+  height:56px;display:flex;align-items:center;padding:8px 12px;gap:12px;
+  border-bottom:1px solid rgba(0,0,0,0.04);
+  background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(0,0,0,0.01));
+}
+
+/* ---------------------------
+   Menus, dropdowns, context
+   --------------------------- */
+
+/* base menu panel */
+.winui-menu{
+  min-width:200px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  border-radius:8px;
+  padding:8px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+  border:1px solid rgba(0,0,0,0.06);
+  color:var(--winui-fore);
+}
+.winui-menu .menu-item{
+  display:flex;align-items:center;gap:10px;padding:8px;border-radius:6px;cursor:pointer;
+}
+.winui-menu .menu-item:hover,
+.winui-menu .menu-item:focus{ background: rgba(0,0,0,0.04) }
+.winui-menu .menu-item[aria-disabled="true"]{ opacity:0.45; cursor:default }
+
+/* split-dropdown */
+.winui-dropdown{
+  position:relative;display:inline-block;
+}
+.winui-dropdown .menu-panel{
+  position:absolute;top:calc(100% + 8px);left:0;z-index:60;
+  transform-origin: top center;
+  opacity:0;transform: translateY(-6px) scale(.98);
+  transition:opacity var(--motion-duration) var(--motion-easing), transform var(--motion-duration) var(--motion-easing);
+  pointer-events:none;
+}
+.winui-dropdown.open .menu-panel{ opacity:1;transform: translateY(0) scale(1); pointer-events:auto; }
+
+/* context menu anchor-square */
+.winui-contextmenu{ position:fixed; z-index:90; }
+
+/* ---------------------------
+   Tooltip
+   --------------------------- */
+.winui-tooltip{
+  position:relative;display:inline-block;
+}
+.winui-tooltip .tooltip-panel{
+  position:absolute;z-index:80;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;
+  background:rgba(0,0,0,0.85);color:#fff;padding:6px 8px;border-radius:6px;font-size:13px;
+  opacity:0;transform-origin: center bottom;transition:opacity 120ms linear, transform 120ms linear;
+  pointer-events:none;
+}
+.winui-tooltip:hover .tooltip-panel,
+.winui-tooltip:focus-within .tooltip-panel{
+  opacity:1; transform:translateX(-50%) translateY(-4px);
+}
+
+/* ---------------------------
+   Toggle / Checkbox / Radio / Switch
+   --------------------------- */
+.winui-toggle{
+  --track-w: 40px; --track-h:22px; --knob:18px;
+  width:var(--track-w); height:var(--track-h);
+  border-radius:999px; background:rgba(0,0,0,0.12); position:relative; cursor:pointer;
+  transition: background var(--motion-duration);
+}
+.winui-toggle .knob{
+  width:var(--knob);height:var(--knob);background:white;border-radius:50%;
+  position:absolute;top:50%;left:3px;transform:translateY(-50%);box-shadow:var(--elevation-1);
+  transition: left var(--motion-duration) var(--motion-easing), transform var(--motion-duration);
+}
+.winui-toggle.on{ background: linear-gradient(90deg,var(--accent-100),var(--accent-90)); }
+.winui-toggle.on .knob{ left:calc(100% - var(--knob) - 3px) }
+
+/* Checkbox (visual) */
+.winui-checkbox{
+  width:18px;height:18px;border-radius:4px;border:1px solid rgba(0,0,0,0.09);display:inline-grid;place-items:center;
+  background:transparent;
+}
+.winui-checkbox.checked{ background:var(--accent-100); color:white; border-color:transparent }
+
+/* Radio */
+.winui-radio{
+  width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,0.09);display:inline-grid;place-items:center;
+}
+.winui-radio.checked{ background:var(--accent-100); }
+
+.input-row{ display:flex;gap:12px;align-items:center }
+
+/* ---------------------------
+   Slider & Progress
+   --------------------------- */
+.winui-slider{
+  width:220px;height:28px;display:flex;align-items:center;gap:10px;
+}
+.winui-progress{
+  position:relative;height:8px;border-radius:999px;background:rgba(0,0,0,0.06);overflow:hidden;
+}
+.winui-progress .value{ position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--accent-100),var(--accent-90));width:40%;transition:width 240ms var(--motion-easing) }
+
+/* ---------------------------
+   Dialog / Modal
+   --------------------------- */
+.winui-modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,0.32);display:flex;align-items:center;justify-content:center;z-index:100;
+  opacity:0;pointer-events:none;transition:opacity var(--motion-duration);
+}
+.winui-modal-backdrop.open{ opacity:1;pointer-events:auto }
+.winui-modal{
+  width:640px;max-width:96%;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.02));padding:20px;border-radius:12px;
+  box-shadow:var(--elevation-2);border:1px solid rgba(0,0,0,0.06);
+}
+
+/* ---------------------------
+   Toasts / Notifications
+   --------------------------- */
+.winui-toast-area{ position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:120 }
+.winui-toast{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  padding:12px 14px;border-radius:10px;box-shadow:var(--elevation-1);display:flex;gap:12px;align-items:center;
+  transform-origin:right bottom;transition: transform 240ms var(--motion-easing), opacity 240ms var(--motion-easing);
+}
+.winui-toast.hide{ opacity:0; transform: translateX(12px) translateY(12px) }
+
+/* ---------------------------
+   Small helpers
+   --------------------------- */
+.winui-muted{ color:var(--winui-muted); font-size:13px }
+.flex{ display:flex }
+.center{ display:grid;place-items:center }
+
+/* Accessibility focus outline */
+:focus{ outline: none }
+:focus-visible{ box-shadow: 0 0 0 4px rgba(43,136,216,0.12); border-radius:6px }
+
+/* Responsive */
+@media (max-width:600px){
+  .winui-sidebar{ width:80px }
+  .winui-topbar{ padding:8px }
+}
