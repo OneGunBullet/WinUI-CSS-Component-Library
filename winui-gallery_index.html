@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WinUI in CSS — Gallery</title>
+  <link rel="stylesheet" href="styles/winui3-replica.css">
+  <style>
+    /* Small gallery-specific overrides */
+    :root { --page-pad: 20px; }
+    body { padding: var(--page-pad); background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent); }
+    .app { display:grid; grid-template-columns: 280px 1fr; gap:24px; align-items:start; max-width:1200px; margin:0 auto; }
+    header.gallery-header { grid-column: 1 / -1; display:flex; gap:12px; align-items:center; }
+    header h1 { margin:0; font-size:20px; }
+    .sidebar { padding:12px; }
+    .content { display:flex; flex-direction:column; gap:20px; padding:12px; }
+    .panel { background: transparent; }
+    .section { display:block; background:var(--surface-1); border-radius:12px; padding:16px; border:1px solid var(--surface-border); box-shadow: var(--elev-1); }
+    .section h2 { margin:0 0 12px 0; font-size:16px; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .tile-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+    footer { grid-column: 1 / -1; text-align:center; color:var(--text-secondary); margin-top:10px; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; background: rgba(0,0,0,0.04); padding:2px 6px; border-radius:6px; }
+    .muted { color: var(--text-secondary); font-size:13px; }
+    .mini { font-size:13px; color:var(--text-secondary) }
+
+    /* Make demo responsive */
+    @media (max-width:960px) {
+      .app { grid-template-columns: 1fr; padding:12px; }
+      header.gallery-header { flex-direction:column; align-items:flex-start; gap:6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="gallery-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="winui-avatar" style="width:44px;height:44px;background:linear-gradient(90deg,var(--accent-100),var(--accent-90));display:grid;place-items:center;color:#fff;font-weight:700;border-radius:10px">W</div>
+        <div>
+          <h1>WinUI in CSS — Component Gallery</h1>
+          <div class="muted mini">A visual showcase of WinUI components implemented in plain CSS</div>
+        </div>
+      </div>
+
+      <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+        <button id="darkToggle" class="winui-btn small">Toggle Dark</button>
+        <button id="openToast" class="winui-btn small">Show Toast</button>
+      </div>
+    </header>
+
+    <aside class="sidebar winui-sidebar winui-mica">
+      <nav style="display:flex;flex-direction:column;gap:8px">
+        <a class="winui-navitem active" href="#"><span class="winui-icon">🏠</span><span>Home</span></a>
+        <a class="winui-navitem" href="#"><span class="winui-icon">🔎</span><span>Search</span></a>
+        <a class="winui-navitem" href="#"><span class="winui-icon">🛍️</span><span>Store</span></a>
+        <a class="winui-navitem" href="#"><span class="winui-icon">⚙️</span><span>Settings</span></a>
+      </nav>
+
+      <div style="flex:1"></div>
+
+      <div style="margin-top:12px">
+        <div class="muted mini">Tokens</div>
+        <div class="row" style="margin-top:8px">
+          <div class="winui-chip">Accent</div>
+          <div class="winui-chip">Mica</div>
+          <div class="winui-chip">Acrylic</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <!-- Buttons -->
+      <section class="section" id="buttons">
+        <h2>Buttons</h2>
+        <div class="row" style="align-items:center">
+          <button class="winui-btn accent winui-reveal">Primary</button>
+          <button class="winui-btn filled winui-reveal">Filled</button>
+          <button class="winui-btn ghost">Ghost</button>
+          <button class="winui-btn small">Small</button>
+          <button class="winui-btn round">Round</button>
+          <div class="winui-split">
+            <div class="main">Split</div>
+            <div class="chev">▾</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search & Inputs -->
+      <section class="section" id="inputs">
+        <h2>Search & Inputs</h2>
+        <div class="row" style="align-items:center">
+          <label class="winui-input winui-searchbox" style="min-width:340px">
+            <span class="winui-icon">🔎</span>
+            <input placeholder="Search gallery..." id="searchInput" />
+            <button class="winui-icon-btn" title="Search">↩︎</button>
+          </label>
+
+          <label class="winui-input" style="width:260px">
+            <span class="winui-icon">✉️</span>
+            <input placeholder="Email address" />
+          </label>
+
+          <div class="winui-autosuggest" style="max-width:360px">
+            <div class="item">suggestion@example.com</div>
+            <div class="item">another@example.com</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sidebar / Nav preview -->
+      <section class="section" id="sidebar-preview">
+        <h2>Sidebar / Navigation</h2>
+        <div class="row">
+          <div style="width:220px" class="winui-sidebar">
+            <a class="winui-navitem active"><span class="winui-icon">🏠</span><span>Home</span></a>
+            <a class="winui-navitem"><span class="winui-icon">🎮</span><span>Games</span></a>
+            <a class="winui-navitem"><span class="winui-icon">🛒</span><span>Store</span></a>
+            <a class="winui-navitem"><span class="winui-icon">📁</span><span>Library</span></a>
+          </div>
+
+          <div style="flex:1">
+            <div class="muted mini">Compact mode below</div>
+            <div class="winui-sidebar compact" style="margin-top:8px">
+              <a class="winui-navitem"><span class="winui-icon">🏠</span></a>
+              <a class="winui-navitem"><span class="winui-icon">🎮</span></a>
+              <a class="winui-navitem"><span class="winui-icon">🛒</span></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards & Store hero -->
+      <section class="section" id="cards">
+        <h2>Cards & Store-like Sections</h2>
+
+        <div class="tile-grid" style="margin-top:8px">
+          <div class="winui-store-hero winui-tile">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:120px;height:80px;background:linear-gradient(90deg,var(--accent-100),var(--accent-90));border-radius:8px"></div>
+              <div class="hero-content">
+                <div style="font-weight:700">Featured App</div>
+                <div class="muted">A highlighted hero like the Microsoft Store</div>
+                <div style="margin-top:8px">
+                  <button class="winui-btn accent">Install</button>
+                  <button class="winui-btn ghost">Details</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tiles -->
+          <div class="winui-tile">
+            <img class="tile-thumb" src="https://via.placeholder.com/520x260" alt="thumb">
+            <div class="tile-body">
+              <div style="font-weight:700">App Tile</div>
+              <div class="muted">Category • Rating</div>
+            </div>
+          </div>
+
+          <div class="winui-tile">
+            <img class="tile-thumb" src="https://via.placeholder.com/520x260/ccc" alt="thumb">
+            <div class="tile-body">
+              <div style="font-weight:700">Another App</div>
+              <div class="muted">Category • Rating</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menus & Context -->
+      <section class="section" id="menus">
+        <h2>Menus & Context Menus</h2>
+        <div class="row" style="align-items:center">
+          <div style="position:relative">
+            <button id="menuBtn" class="winui-btn">Open menu ▾</button>
+            <div id="menuPanel" class="winui-panel" style="left:0; top:48px;">
+              <div class="winui-menu">
+                <div class="winui-menuitem">New File</div>
+                <div class="winui-menuitem">Open Folder</div>
+                <div class="winui-menuitem">Save All</div>
+              </div>
+            </div>
+          </div>
+
+          <button id="ctxTarget" class="winui-btn">Right-click here</button>
+          <div class="muted mini">Right-click to open a demo context menu</div>
+        </div>
+      </section>
+
+      <!-- Toggles, checkboxes, radios -->
+      <section class="section" id="toggles">
+        <h2>Toggles & Controls</h2>
+        <div class="row" style="align-items:center">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <div id="s1" class="winui-switch"><div class="knob"></div></div>
+              <div class="muted">Notifications</div>
+            </div>
+
+            <div style="display:flex;gap:12px;align-items:center">
+              <div id="cb1" class="winui-checkbox"></div>
+              <div class="muted">Enable updates</div>
+            </div>
+
+            <div style="display:flex;gap:12px;align-items:center">
+              <div id="r1" class="winui-radio"></div>
+              <div class="muted">Option A</div>
+            </div>
+          </div>
+
+          <div style="flex:1"></div>
+
+          <div style="width:280px">
+            <div class="winui-progress"><div id="pval" class="winui-progress-value" style="width:36%"></div></div>
+            <input id="slider" type="range" min="0" max="100" value="36" style="width:100%; margin-top:8px">
+          </div>
+        </div>
+      </section>
+
+      <!-- Tooltips, Toasts, Dialog -->
+      <section class="section" id="misc">
+        <h2>Tooltips, Toasts & Dialogs</h2>
+        <div class="row" style="align-items:center">
+          <div class="winui-tooltip">
+            <button class="winui-icon-btn">i</button>
+            <div class="winui-tip winui-tip-left">Helpful hint</div>
+          </div>
+
+          <button id="openModal" class="winui-btn">Open Modal</button>
+          <div class="muted mini">Toasts appear in bottom-right when you click "Show Toast"</div>
+        </div>
+      </section>
+
+      <footer>WinUI in CSS — Demo gallery • Designed for visual parity, fonts & icons not included</footer>
+    </main>
+
+    <!-- Toast area -->
+    <div class="winui-toast-area" id="toastArea" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <!-- Modal markup (hidden by default) -->
+  <div id="modalBackdrop" class="winui-modal-backdrop" style="display:none; opacity:0; pointer-events:none;">
+    <div class="winui-modal winui-fade-in" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Sample Dialog</h3>
+      <p class="muted">This demonstrates the ContentDialog visual. It is a visual-only demo.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+        <button id="closeModal" class="winui-btn ghost">Close</button>
+        <button class="winui-btn accent">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/gallery.js"></script>
+</body>
+</html>
