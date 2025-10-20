@@ -1,0 +1,686 @@
+/* WinUI-inspired YouTube skin (single-file CSS)
+   - Scope: targeted YouTube skinning (visual only)
+   - Format: plain CSS, modern browsers (CSS variables, backdrop-filter)
+   - No JS included (raw CSS). Use a userscript or Stylus to inject on YouTube pages.
+   - Notes: Some YouTube internals use shadow DOM or dynamic classes; for full coverage you may add a tiny userscript to add classes or target dynamic selectors.
+   - Fonts & icons: For best fidelity install Segoe UI Variable / Segoe UI or point to an equivalent. Fluent icons must be supplied separately.
+   - How to use: inject this stylesheet into youtube.com pages (Stylus/user CSS extension or userscript that inserts a <link> or <style>).
+*/
+
+/* ===============================
+   Design tokens (light and dark)
+   =============================== */
+:root{
+  /* base metrics */
+  --winui-radius-sm: 6px;
+  --winui-radius: 10px;
+  --winui-radius-lg: 14px;
+  --winui-gap: 12px;
+
+  --winui-font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
+  --winui-font-size: 14px;
+  --winui-line-height: 1.36;
+
+  /* neutral palette (light) */
+  --neutral-0: #ffffff;
+  --neutral-10: #f5f5f6;
+  --neutral-20: #efeff0;
+  --neutral-30: #e6e6e7;
+  --neutral-40: #d0d0d1;
+  --neutral-60: #8a8a8b;
+  --neutral-80: #4b4b4c;
+  --neutral-90: #232323;
+  --neutral-100: #000000;
+
+  /* accent (WinUI blue) */
+  --accent-100: #0078d4; /* primary */
+  --accent-90: #106ebe;
+  --accent-60: #2b88d8;
+  --accent-40: rgba(43,136,216,0.12);
+  --accent-12: rgba(0,120,212,0.12);
+
+  /* backgrounds / surfaces */
+  --bg-page: linear-gradient(180deg, var(--neutral-10), rgba(0,0,0,0));
+  --surface-1: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.01));
+  --surface-border: rgba(0,0,0,0.06);
+
+  /* material */
+  --mica-base: rgba(255,255,255,0.72);
+  --acrylic-tint: rgba(255,255,255,0.36);
+
+  /* motion */
+  --motion-fast: 120ms;
+  --motion: 220ms;
+  --motion-long: 420ms;
+  --motion-ease: cubic-bezier(.2,.9,.2,1);
+
+  /* elevation (shadows) */
+  --elev-1: 0 4px 12px rgba(16,16,16,0.06);
+  --elev-2: 0 10px 26px rgba(16,16,16,0.10);
+  --elev-3: 0 18px 40px rgba(16,16,16,0.16);
+
+  /* sizes */
+  --control-height: 36px;
+  --icon-btn-size: 36px;
+  --focus-ring: 4px;
+
+  /* color usage */
+  --text-primary: var(--neutral-90);
+  --text-secondary: var(--neutral-60);
+
+  color-scheme: light;
+  --winui-theme: light;
+}
+
+/* Dark theme (toggle by adding data-theme="dark" on <html> or <body>) */
+:root[data-theme="dark"] {
+  --neutral-0: #0b0b0c;
+  --neutral-10: #0f0f10;
+  --neutral-20: #151516;
+  --neutral-30: #1b1b1c;
+  --neutral-40: #232324;
+  --neutral-60: #bdbdc1;
+  --neutral-80: #dedee1;
+  --neutral-90: #f2f2f2;
+  --neutral-100: #ffffff;
+
+  --accent-100: #2899f5;
+  --accent-90: #1f6fd9;
+  --accent-60: #2b88d8;
+  --accent-40: rgba(43,136,216,0.12);
+
+  --mica-base: rgba(20,20,21,0.56);
+  --acrylic-tint: rgba(20,20,21,0.32);
+
+  --bg-page: linear-gradient(180deg, var(--neutral-10), rgba(255,255,255,0));
+  --surface-border: rgba(255,255,255,0.06);
+
+  --text-primary: var(--neutral-100);
+  --text-secondary: var(--neutral-80);
+
+  color-scheme: dark;
+  --winui-theme: dark;
+}
+
+/* Behavioral assist for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 1ms; --motion: 1ms; --motion-long: 1ms; --motion-ease: linear; }
+}
+
+/* ===============================
+   Basic resets & typography
+   =============================== */
+* { box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--winui-font-family);
+  font-size: var(--winui-font-size);
+  line-height: var(--winui-line-height);
+  color: var(--text-primary);
+  background: var(--bg-page);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Utility classes */
+.winui-hidden { display:none !important; }
+.winui-sr-only {
+  position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+/* Focus visuals */
+:focus { outline: none; }
+:focus-visible { box-shadow: 0 0 0 var(--focus-ring) rgba(0,120,212,0.12); border-radius:6px; }
+
+/* ===============================
+   Materials: Mica & Acrylic
+   =============================== */
+
+/* Mica: page-level or large surface, non-blurred layered tint */
+.winui-mica {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.01)),
+    var(--mica-base);
+  border-radius: var(--winui-radius);
+  color: inherit;
+  box-shadow: var(--elev-1);
+}
+
+/* Acrylic: translucent blurred surface */
+.winui-acrylic {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border-radius: var(--winui-radius);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--elev-1);
+  backdrop-filter: blur(12px) saturate(1.05);
+  -webkit-backdrop-filter: blur(12px) saturate(1.05);
+}
+
+/* ===============================
+   Reveal / Highlight (WinUI Reveal)
+   =============================== */
+/* Generic reveal effect that can be applied to interactive elements.
+   We'll automatically attach it to many YouTube interactive selectors below. */
+.winui-reveal { position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+.winui-reveal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(255,255,255,0.06), transparent 28%);
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity var(--motion) var(--motion-ease), transform var(--motion) var(--motion-ease);
+  mix-blend-mode: screen;
+}
+:root[data-theme="dark"] .winui-reveal::after {
+  background: radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(0,0,0,0.14), transparent 28%);
+  mix-blend-mode: multiply;
+}
+.winui-reveal:hover::after,
+.winui-reveal:focus-within::after { opacity: 1; transform: scale(1.06); }
+
+/* Helper: subtle pointer polyfill (if you inject pointer coords via JS, it'll feel native) */
+
+/* ===============================
+   Buttons & Icon Buttons
+   =============================== */
+.winui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--control-height);
+  min-width: 44px;
+  padding: 0 12px;
+  gap: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  font-weight: 600;
+  user-select: none;
+  transition: transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion);
+}
+
+.winui-btn:active { transform: translateY(0.5px); }
+
+/* Accent (primary) button */
+.winui-btn.primary, .winui-btn.accent {
+  background: linear-gradient(0deg, var(--accent-100), var(--accent-100));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0,120,212,0.12);
+}
+.winui-btn.primary:hover { filter: brightness(1.04); transform: translateY(-1px); }
+
+/* Subtle filled */
+.winui-btn.filled {
+  background: var(--surface-1);
+  border: 1px solid var(--surface-border);
+}
+
+/* Ghost / outline */
+.winui-btn.ghost { background: transparent; border: 1px solid var(--surface-border); }
+
+/* Icon button */
+.winui-icon-btn {
+  width: var(--icon-btn-size);
+  height: var(--icon-btn-size);
+  padding: 6px;
+  border-radius: 8px;
+  display: inline-grid;
+  place-items: center;
+  background: transparent;
+  border: none;
+}
+
+/* Small / round */
+.winui-btn.small { height: 28px; padding: 0 10px; font-size: 13px; border-radius: 6px; }
+.winui-btn.round { border-radius: 999px; }
+
+/* icon helper */
+.winui-icon {
+  width: 18px; height: 18px; display: inline-grid; place-items: center; pointer-events: none;
+}
+
+/* ===============================
+   Inputs & Searchbox
+   =============================== */
+.winui-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-height);
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-border);
+  color: inherit;
+}
+
+.winui-input input, .winui-input textarea {
+  border: 0; outline: 0; background: transparent; color: inherit; font: inherit; width: 100%;
+}
+
+.winui-input:focus-within { box-shadow: 0 0 0 6px rgba(43,136,216,0.06); }
+
+/* Searchbar specific styling for YouTube topbar area */
+.winui-searchbox {
+  min-width: 320px;
+  max-width: 720px;
+}
+
+/* ===============================
+   Cards / Tile surfaces
+   =============================== */
+.winui-card {
+  background: var(--surface-1);
+  border-radius: var(--winui-radius);
+  padding: 12px;
+  box-shadow: var(--elev-1);
+  border: 1px solid var(--surface-border);
+  color: inherit;
+}
+
+/* Video tile / grid card variations */
+.winui-tile {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.01));
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform var(--motion) var(--motion-ease), box-shadow var(--motion);
+}
+.winui-tile:hover { transform: translateY(-6px); box-shadow: var(--elev-2); }
+
+/* ===============================
+   Navigation / Sidebar
+   =============================== */
+.winui-navigation {
+  width: 260px;
+  padding: 12px;
+  background: var(--surface-1);
+  border-right: 1px solid var(--surface-border);
+  min-height: 100vh;
+}
+.winui-navitem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+.winui-navitem:hover { background: rgba(0,0,0,0.03); }
+.winui-navitem.active { background: linear-gradient(180deg, var(--accent-40), transparent); color: var(--accent-100); }
+
+/* ===============================
+   Menus & Dropdowns & Context
+   =============================== */
+.winui-menu {
+  min-width: 220px;
+  background: var(--surface-1);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: var(--elev-2);
+  border: 1px solid var(--surface-border);
+}
+.winui-menu .winui-menuitem {
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+}
+.winui-menu .winui-menuitem:hover { background: rgba(0,0,0,0.04); }
+
+/* ===============================
+   Tooltip
+   =============================== */
+.winui-tooltip {
+  position: relative;
+  display: inline-block;
+}
+.winui-tooltip .winui-tip {
+  position: absolute;
+  z-index: 9999;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  background: rgba(20,20,20,0.9);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-fast) linear, transform var(--motion-fast) linear;
+}
+.winui-tooltip:hover .winui-tip,
+.winui-tooltip:focus-within .winui-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===============================
+   Toggle / Checkbox / Switch
+   =============================== */
+.winui-switch {
+  --w: 40px; --h: 22px; --k: 18px;
+  width: var(--w); height: var(--h);
+  border-radius: 999px; background: rgba(0,0,0,0.12);
+  position: relative; cursor: pointer; transition: background var(--motion);
+}
+.winui-switch .knob {
+  width: var(--k); height: var(--k); border-radius: 50%;
+  background: #fff; position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
+  box-shadow: var(--elev-1); transition: left var(--motion) var(--motion-ease);
+}
+.winui-switch.on { background: linear-gradient(90deg, var(--accent-100), var(--accent-90)); }
+.winui-switch.on .knob { left: calc(100% - var(--k) - 3px); }
+
+/* Check / radio visual wrappers */
+.winui-checkbox {
+  width: 18px; height: 18px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.09);
+  display: inline-grid; place-items: center;
+}
+.winui-checkbox.checked {
+  background: var(--accent-100); color: #fff; border-color: transparent;
+}
+.winui-radio {
+  width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.09);
+}
+.winui-radio.checked { background: var(--accent-100); }
+
+/* ===============================
+   Slider & Progress
+   =============================== */
+.winui-progress {
+  height: 8px; border-radius: 999px; background: rgba(0,0,0,0.06); overflow: hidden; position: relative;
+}
+.winui-progress .winui-progress-value {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg, var(--accent-100), var(--accent-90));
+  width: 40%; transition: width var(--motion) var(--motion-ease);
+}
+
+/* ===============================
+   Dialog / Modal visual
+   =============================== */
+.winui-modal-backdrop {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.32); z-index: 99999; opacity: 1; pointer-events: auto;
+}
+.winui-modal {
+  width: 720px; max-width: 96%; padding: 20px; border-radius: 12px;
+  background: var(--surface-1); border: 1px solid var(--surface-border); box-shadow: var(--elev-2);
+}
+
+/* ===============================
+   Toast / Notification
+   =============================== */
+.winui-toast-area {
+  position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 10px; z-index: 99999;
+}
+.winui-toast {
+  padding: 12px 14px; border-radius: 10px; background: var(--surface-1); box-shadow: var(--elev-1);
+  transition: transform var(--motion) var(--motion-ease), opacity var(--motion) var(--motion-ease);
+}
+
+/* ===============================
+   List / Grid visuals
+   =============================== */
+.winui-list { display: flex; flex-direction: column; gap: 6px; }
+.winui-list .winui-list-item { padding: 10px; border-radius: 8px; display: flex; gap: 12px; align-items: center; }
+.winui-list .winui-list-item:hover { background: rgba(0,0,0,0.03); }
+
+.winui-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+
+/* ===============================
+   YouTube mapping (example selectors)
+   - These rules target common YouTube elements and apply WinUI visuals.
+   - You may need to adapt selectors if YouTube changes its DOM.
+   - Use !important where necessary to override inline/user-agent styles injected by YouTube.
+   =============================== */
+
+/* Page background / frame */
+ytd-app, #page-manager, ytd-page-manager, body#ytd-app {
+  background: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+  font-family: var(--winui-font-family) !important;
+}
+
+/* Masthead / top bar */
+#masthead-container,
+ytm-appbar-renderer,
+ytd-masthead,
+#container ytd-masthead {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  border-bottom: 1px solid var(--surface-border) !important;
+  padding: 0 12px !important;
+  height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Replace the default masthead background area with acrylic-like surface for a WinUI look */
+#masthead-container.yt-winui,
+ytd-masthead.winui-acrylic {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)) !important;
+  backdrop-filter: blur(10px) saturate(1.05) !important;
+  border-bottom: 1px solid var(--surface-border) !important;
+  box-shadow: none !important;
+}
+
+/* Top-left logo area */
+#logo, ytd-topbar-logo-renderer, #logo-icon-container {
+  border-radius: 8px;
+  padding: 6px;
+}
+
+/* Search box area (center) */
+#search, ytd-searchbox, ytd-masthead #search {
+  background: var(--surface-1) !important;
+  border: 1px solid var(--surface-border) !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  padding: 0 8px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Search input inside YouTube */
+#search-input, #search-form input, #search-input input {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border: 0 !important;
+  outline: none !important;
+  font: inherit !important;
+  height: 28px !important;
+}
+
+/* Action buttons on the right of the topbar */
+#end, #top-level-buttons, #end #top-level-buttons-computed, ytd-topbar-menu-button-renderer {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+#end ytd-button-renderer, #end tp-yt-paper-button, .ytp-button, ytd-topbar-menu-button-renderer {
+  background: transparent !important;
+  border-radius: 8px !important;
+  height: var(--icon-btn-size) !important;
+  width: var(--icon-btn-size) !important;
+  padding: 6px !important;
+}
+
+/* Make clickable thumbnails & suggested tiles look like WinUI tiles */
+ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-rich-grid-media, ytd-video-renderer, ytd-compact-video-renderer {
+  background: transparent !important;
+}
+ytd-rich-item-renderer .ytd-rich-grid-media, ytd-grid-video-renderer, ytd-rich-grid-media {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+/* Thumbnail overlay area (apply accent scrim on hover) */
+ytd-thumbnail, #thumbnail {
+  border-radius: 8px !important;
+  transition: transform var(--motion) var(--motion-ease) !important;
+}
+ytd-thumbnail:hover, #thumbnail:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: var(--elev-2) !important;
+}
+
+/* Video title and metadata containers use WinUI typography */
+#meta-contents, ytd-video-primary-info-renderer, ytd-video-secondary-info-renderer, #info-contents, #container #info {
+  color: var(--text-primary) !important;
+}
+#meta-contents yt-formatted-string, ytd-video-primary-info-renderer h1, #container h1, #container h2 {
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+}
+
+/* Sidebar/guide (left navigation) */
+#guide, ytd-guide-renderer, ytd-guide-section-renderer {
+  background: var(--surface-1) !important;
+  border-right: 1px solid var(--surface-border) !important;
+  padding: 12px !important;
+  width: 260px !important;
+}
+#guide a, ytd-guide-entry-renderer a {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 8px !important;
+  border-radius: 8px !important;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+#guide a:hover, ytd-guide-entry-renderer a:hover { background: rgba(0,0,0,0.03) !important; }
+
+/* Right rail (recommendations) tiles */
+#secondary, ytd-watch-next-secondary-results-renderer, #secondary-inner {
+  background: transparent !important;
+}
+
+/* Comments container resembles WinUI card */
+#comments #contents, #comments ytd-comment-thread-renderer {
+  background: var(--surface-1) !important;
+  border-radius: 10px !important;
+  padding: 12px !important;
+  border: 1px solid var(--surface-border) !important;
+}
+
+/* Player chrome: many player elements are within a custom controls overlay */
+/* Basic styling on known controls (these may change or be in shadow DOM) */
+.ytp-chrome-controls, .ytp-chrome-bottom, .ytp-chrome-top {
+  background: linear-gradient(180deg, rgba(0,0,0,0.24), transparent) !important;
+}
+
+/* Make player buttons more WinUI-like */
+.ytp-button, .ytp-play-button, .ytp-large-play-button, .ytp-control-button {
+  border-radius: 6px !important;
+  background: rgba(0,0,0,0.28) !important;
+  color: #fff !important;
+}
+
+/* Context menus and popovers (global) */
+[role="menu"], paper-listbox, tp-yt-paper-listbox, tp-yt-paper-item, .ytp-popup, .ytp-menu {
+  background: var(--surface-1) !important;
+  border: 1px solid var(--surface-border) !important;
+  box-shadow: var(--elev-2) !important;
+  border-radius: 8px !important;
+  color: var(--text-primary) !important;
+}
+
+/* Buttons and anchors - apply reveal effect to key interactive elements */
+a, a[href], button, yt-button-renderer, tp-yt-paper-button, ytd-toggle-button-renderer, .ytp-button, .ytd-rich-grid-media, #thumbnail, ytd-rich-item-renderer {
+  -webkit-tap-highlight-color: transparent !important;
+}
+a:hover, button:hover, .ytp-button:hover {
+  text-decoration: none !important;
+}
+
+/* Attach WinUI reveal to many interactive elements so the site feels native */
+a, ytd-thumbnail, #thumbnail, ytd-grid-video-renderer, ytd-rich-item-renderer, ytd-compact-video-renderer, ytd-grid-renderer, ytd-rich-grid-row {
+  /* Not forcing classes into DOM; use descendant pseudo to add visual behavior */
+  /* We can't inject ::after into host elements reliably for all; the .winui-reveal utility is provided if you add classes via script/extension. */
+}
+
+/* Cards/tile caption and meta styling */
+#video-title, #video-title a, h3.title, #title a, .ytd-rich-grid-media .title {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Subtle separators */
+ytd-browse, ytd-two-column-browse-results-renderer, ytd-two-column-search-results-renderer {
+  border-top: 1px solid var(--surface-border) !important;
+}
+
+/* ===============================
+   Lightweight theme helpers for YouTube-specific contexts
+   - These provide toggles you can flip via a userscript or Stylus variable overrides
+   =============================== */
+
+/* Compact video tile (example: to be applied with a class on container) */
+.winui-compact-grid ytd-rich-grid-media, .winui-compact-grid ytd-grid-video-renderer {
+  padding: 8px !important;
+  border-radius: 8px !important;
+}
+
+/* Apply acrylic masthead */
+.winui-acrylic-masthead #masthead-container, .winui-acrylic-masthead ytd-masthead {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)) !important;
+  backdrop-filter: blur(10px) saturate(1.05) !important;
+}
+
+/* Apply WinUI card to video-info area */
+.winui-video-info #meta-contents, .winui-video-info ytd-video-primary-info-renderer {
+  background: var(--surface-1) !important;
+  border-radius: 10px !important;
+  padding: 12px !important;
+  border: 1px solid var(--surface-border) !important;
+}
+
+/* ===============================
+   Customization guide (comments for quick edits)
+   - To change accent: override --accent-100
+   - To switch to dark mode: add data-theme="dark" to <html> or <body>
+   - To enable Segoe UI: set --winui-font-family to the installed font stack
+   - To inject reveal pointer positions: a small userscript that updates --pointer-x/--pointer-y on :hover improves reveal realism.
+   =============================== */
+
+/* Quick customization examples (uncomment and modify in your injected CSS scope) */
+/*
+:root {
+  --accent-100: #ff2d55; // use YouTube-red accent if desired
+  --winui-radius: 12px;
+}
+
+html[data-theme="dark"] {
+  --accent-100: #ff6b6b;
+}
+*/
+
+/* ===============================
+   Small accessibility & responsive tweaks
+   =============================== */
+@media (max-width: 720px) {
+  /* collapse left nav visually similar to WinUI compact */
+  #guide, ytd-guide-renderer { width: 80px !important; padding-left: 8px !important; padding-right: 8px !important; }
+  #masthead-container, ytd-masthead { padding: 0 8px !important; }
+  .winui-searchbox { min-width: 160px !important; }
+}
+
+/* Final note:
+   - This stylesheet focuses on visuals. To achieve pixel-perfect WinUI behavior you'll want:
+     1) Segoe UI Variable installed or a comparable web font.
+     2) Fluent icons/SVG sprites for icons and glyphs.
+     3) (Optional) a tiny userscript that toggles classes (e.g., add .winui-reveal to interactive elements, add .winui-acrylic-masthead to <body> on load, inject pointer coordinates for reveal).
+   - I intentionally avoided aggressive !important overuse except where needed to override YouTube inline or highly-specific selectors. When porting to your userscript or extension you can increase specificity or add classes via JS to make overrides robust.
+*/
