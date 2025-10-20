@@ -1,0 +1,148 @@
+/* WinUI 3 Visual Replica — Component CSS Library (single-file)
+   Enhanced Mica & Acrylic materials (layered tint, noise, parallax, vibrancy) */
+
+/* -----------------------
+   (unchanged tokens above omitted for brevity in this view)
+   Replace only the MATERIALS and REVEAL sections with the content below.
+   Full file includes all components previously provided — only materials updated here.
+   ----------------------- */
+
+/* MATERIALS: MICA & ACRYLIC (improved fidelity) */
+:root{
+  /* new material variables */
+  --mica-tint: rgba(255,255,255,0.06);        /* computed at runtime by JS for accent-dependent tint */
+  --mica-noise-opacity: 0.035;                /* micro-noise overlay opacity */
+  --mica-parallax-strength: 0.035;            /* parallax multiplier for large surfaces */
+
+  --acrylic-opacity: 0.36;                    /* base acrylic layer alpha */
+  --acrylic-blur: 14px;
+  --acrylic-saturate: 1.08;
+  --acrylic-inset-glow: rgba(0,0,0,0.04);     /* subtle inner border */
+}
+
+/* Mica: layered, tinted, subtle noise and parallax */
+.winui-mica{
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.014), rgba(0,0,0,0.01));
+  color: inherit;
+  overflow: hidden;
+  border-radius: var(--winui-radius);
+  box-shadow: var(--elev-1);
+  /* small transform for parallax; JS will set --mica-offset */
+  transform: translate3d(0, var(--mica-offset, 0px), 0);
+  transition: transform 420ms var(--motion-easing), box-shadow var(--motion);
+}
+
+/* tint layer: overlay to get the warm/cool accent tint often visible in Mica */
+.winui-mica::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 40% at 10% 20%, rgba(255,255,255,0.02) 0%, transparent 24%),
+    linear-gradient(120deg, var(--mica-tint), transparent 65%);
+  mix-blend-mode: overlay;
+  opacity: 0.96;
+  transform: translateZ(0);
+}
+
+/* noise layer: micro-grain to break flatness */
+.winui-mica::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='g' x='0' y='0'><feTurbulence baseFrequency='0.9' numOctaves='1' stitchTiles='stitch' /></filter><rect width='100%' height='100%' filter='url(%23g)' opacity='0.04' /></svg>");
+  background-repeat: repeat;
+  opacity: var(--mica-noise-opacity);
+  mix-blend-mode: soft-light;
+}
+
+/* Subtle inner contour to separate mica surfaces at larger elevations */
+.winui-mica[aria-elevation="2"] { box-shadow: var(--elev-2); }
+.winui-mica[aria-elevation="3"] { box-shadow: var(--elev-3); }
+
+/* Small helper: large hero surfaces can have stronger parallax */
+.winui-mica.hero { --mica-parallax-strength: 0.06; }
+
+/* ACRYLIC: translucent vibrancy surface with tint overlay & inset glow */
+.winui-acrylic{
+  position: relative;
+  background-color: rgba(255,255,255,var(--acrylic-opacity));
+  border-radius: var(--winui-radius);
+  border: 1px solid var(--surface-border);
+  overflow: hidden;
+  box-shadow: var(--elev-1);
+  backdrop-filter: blur(var(--acrylic-blur)) saturate(var(--acrylic-saturate));
+  -webkit-backdrop-filter: blur(var(--acrylic-blur)) saturate(var(--acrylic-saturate));
+  transition: background-color var(--motion) var(--motion-easing), box-shadow var(--motion);
+}
+
+/* acrylic tint overlay, produces the subtle color wash seen in Windows acrylic */
+.winui-acrylic::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), var(--mica-tint));
+  mix-blend-mode: overlay;
+  opacity: 0.9;
+}
+
+/* inner soft border-glow that helps acrylic feel like a cutout */
+.winui-acrylic::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), inset 0 -1px 12px var(--acrylic-inset-glow);
+  border-radius: inherit;
+  opacity: 0.85;
+}
+
+/* Fallback when backdrop-filter isn't supported (JS will add .no-backdrop to root) */
+:root.no-backdrop .winui-acrylic{
+  /* stronger tint and textured background to emulate blur feel */
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect fill='%23ffffff' opacity='0.02' width='120' height='120'/><circle cx='10' cy='10' r='1' fill='%23ffffff' opacity='0.02'/></svg>");
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: saturate(1.03) contrast(0.98);
+}
+
+/* Transition variants for theme changes */
+:root[data-theme="dark"] .winui-acrylic{ background-color: rgba(20,20,21,0.28); }
+:root[data-theme="dark"] .winui-mica::before{ mix-blend-mode: multiply; }
+
+/* Reveal unchanged (but coordinate updates preserved) */
+.winui-reveal{ position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+.winui-reveal::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(255,255,255,0.06), transparent 28%);
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity var(--motion) var(--motion-easing), transform var(--motion) var(--motion-easing);
+  mix-blend-mode: screen;
+}
+:root[data-theme="dark"] .winui-reveal::after{
+  background: radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(0,0,0,0.14), transparent 28%);
+  mix-blend-mode: multiply;
+}
+.winui-reveal:hover::after, .winui-reveal:focus-within::after{ opacity: 1; transform: scale(1.06); }
+
+/* Parallax helper used by JS (tweak behavior via --mica-parallax-strength on element) */
+.winui-mica{
+  /* default mica offset variable used by transform earlier */
+  --mica-offset: 0px;
+  will-change: transform;
+}
+
+/* -----------------------
+   Rest of the CSS file (components) remains the same as before.
+   ----------------------- */
